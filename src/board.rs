@@ -5,7 +5,7 @@ use crate::tetromino::Tetromino;
 
 pub const CELL_SIZE: f32 = 30.;
 
-#[derive(Debug, Default, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy, PartialEq)]
 pub enum CellState {
     #[default]
     E,
@@ -21,7 +21,7 @@ struct Cell {
 #[derive(Component, Default)]
 pub struct Board {
     pub state: [[CellState; 10]; 20],
-    placed: [[CellState; 10]; 20],
+    pub placed: [[CellState; 10]; 20],
 }
 
 pub struct BoardPlugin;
@@ -88,10 +88,11 @@ fn show_cells(mut board: Query<&mut Board>, tetro: Query<&Tetromino>) {
         }
     }
 
-    for (i_row, row) in tetro.shape.get_structure().iter().enumerate() {
+    for (i_row, row) in tetro.structure.iter().enumerate() {
         for (i_col, col) in row.iter().enumerate() {
-            if 16 + i_row < tetro.progress { continue;}
-            board.state[16 + i_row - tetro.progress][i_col + tetro.shift] = *col;
+            if 16 + i_row < tetro.progress { continue; }
+            if *col != F { continue; }
+            board.state[16 + i_row - tetro.progress][i_col + tetro.shift] = F;
         }
     }
 }
