@@ -73,7 +73,12 @@ impl Tetromino {
 
         let s = q.pop().unwrap().get_structure();
 
-        Tetromino { structure: s, queue: q, progress: 0, shift: 3 }
+        Tetromino {
+            structure: s,
+            queue: q,
+            progress: 0,
+            shift: 3,
+        }
     }
 }
 

@@ -27,7 +27,8 @@ pub struct Board {
 pub struct BoardPlugin;
 impl Plugin for BoardPlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system(init_board).add_system(update_cells)
+        app.add_startup_system(init_board)
+            .add_system(update_cells)
             .add_system(show_cells);
     }
 }
@@ -90,8 +91,12 @@ fn show_cells(mut board: Query<&mut Board>, tetro: Query<&Tetromino>) {
 
     for (i_row, row) in tetro.structure.iter().enumerate() {
         for (i_col, col) in row.iter().enumerate() {
-            if 16 + i_row < tetro.progress { continue; }
-            if *col != F { continue; }
+            if 16 + i_row < tetro.progress {
+                continue;
+            }
+            if *col != F {
+                continue;
+            }
             board.state[16 + i_row - tetro.progress][i_col + tetro.shift] = F;
         }
     }
