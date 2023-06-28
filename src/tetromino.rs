@@ -1,8 +1,10 @@
+use std::time::Duration;
+
 use bevy::prelude::*;
 use rand::Rng;
 
 use crate::board::{
-    init_board, Board,
+    init_board,
     CellState::{self, *},
 };
 
@@ -18,7 +20,7 @@ pub enum Shape {
 }
 
 impl Shape {
-    fn get_structure(&self) -> [[CellState; 4]; 4] {
+    pub fn get_structure(&self) -> [[CellState; 4]; 4] {
         match self {
             Shape::Straight => [[E; 4], [E; 4], [E; 4], [F; 4]],
             Shape::Square => [[E; 4], [E; 4], [E, F, F, E], [E, F, F, E]],
@@ -31,18 +33,24 @@ impl Shape {
     }
 }
 
+#[derive(Resource)]
+struct DropTimer {
+    timer: Timer,
+}
+
 #[derive(Component)]
 pub struct Tetromino {
-    shape: Shape,
-    queue: Vec<Shape>,
-    proggress: usize,
+    pub shape: Shape,
+    pub queue: Vec<Shape>,
+    pub progress: usize,
+    pub shift: usize,
 }
 
 pub struct TetromiroPlugin;
 impl Plugin for TetromiroPlugin {
     fn build(&self, app: &mut bevy::prelude::App) {
         app.add_startup_system(spawn_tetro.after(init_board))
-            .add_system(show_tetro);
+            .add_system(drop_tetro);
     }
 }
 
@@ -53,27 +61,24 @@ fn random_tetro() -> Shape {
     variants[i].to_owned()
 }
 
+fn drop_tetro(mut tetro: Query<&mut Tetromino>, time: Res<Time>, mut drop_timer: ResMut<DropTimer>) {
+    drop_timer.timer.tick(time.delta());
+
+    if drop_timer.timer.finished() {
+        let mut tetro = tetro.single_mut();
+        tetro.progress += 1;
+    }
+}
+
 fn spawn_tetro(mut commands: Commands) {
+    commands.insert_resource(DropTimer {
+        timer: Timer::new(Duration::from_millis(500), TimerMode::Repeating),
+    });
+
     commands.spawn(Tetromino {
         shape: random_tetro(),
         queue: vec![],
-        proggress: 0,
+        progress: 0,
+        shift: 3,
     });
-}
-
-fn show_tetro(mut board: Query<&mut Board>, tetro: Query<&Tetromino>) {
-    let tetro = match tetro.get_single() {
-        Ok(v) => v,
-        Err(_) => return,
-    };
-    let mut board = match board.get_single_mut() {
-        Ok(v) => v,
-        Err(_) => return,
-    };
-
-    for (i_row, row) in tetro.shape.get_structure().iter().enumerate() {
-        for (i_col, col) in row.iter().enumerate() {
-            board.state[16 + i_row - tetro.proggress][i_col + 3] = *col;
-        }
-    }
 }
