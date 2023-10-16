@@ -27,9 +27,9 @@ pub struct Board {
 pub struct BoardPlugin;
 impl Plugin for BoardPlugin {
     fn build(&self, app: &mut App) {
-        app.add_startup_system(init_board)
-            .add_system(update_cells)
-            .add_system(show_cells);
+        app.add_systems(Startup, init_board)
+            .add_systems(Update, update_cells)
+            .add_systems(Update, show_cells);
     }
 }
 

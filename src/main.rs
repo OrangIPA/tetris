@@ -7,9 +7,9 @@ fn main() {
     App::new()
         .insert_resource(ClearColor(Color::rgb(0., 0., 0.)))
         .add_plugins(DefaultPlugins.set(ImagePlugin::default_nearest()))
-        .add_startup_system(init)
-        .add_plugin(board::BoardPlugin)
-        .add_plugin(tetromino::TetromiroPlugin)
+        .add_systems(Startup, init)
+        .add_plugins(board::BoardPlugin)
+        .add_plugins(tetromino::TetromiroPlugin)
         .run()
 }
 

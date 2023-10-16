@@ -93,8 +93,8 @@ enum Collision {
 pub struct TetromiroPlugin;
 impl Plugin for TetromiroPlugin {
     fn build(&self, app: &mut bevy::prelude::App) {
-        app.add_startup_system(spawn_tetro.after(init_board))
-            .add_system(drop_tetro);
+        app.add_systems(Startup, spawn_tetro.after(init_board))
+            .add_systems(Update, drop_tetro);
     }
 }
 
